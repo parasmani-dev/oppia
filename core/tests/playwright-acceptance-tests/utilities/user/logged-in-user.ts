@@ -1346,9 +1346,22 @@ export class LoggedInUser extends BaseUser {
    * Selects language filter in contributor dashboard.
    */
   async selectLanguageFilter(language: string): Promise<void> {
-    const selector = '.e2e-test-language-selector';
-    await this.expectElementToBeVisible(selector);
-    await this.select(selector, language);
+    const dropdownSelector = '.e2e-test-language-selector';
+    await this.expectElementToBeVisible(dropdownSelector);
+    await this.clickOnElementWithSelector(dropdownSelector);
+
+    const optionSelector =
+      '.e2e-test-language-selector-option, .e2e-test-featured-language-selector-option';
+    await this.expectElementToBeVisible(optionSelector);
+    const options = this.page.locator(optionSelector);
+    const count = await options.count();
+    for (let i = 0; i < count; i++) {
+      const text = await options.nth(i).textContent();
+      if (text && text.includes(language)) {
+        await options.nth(i).click();
+        return;
+      }
+    }
   }
 
   /**
@@ -1358,9 +1371,27 @@ export class LoggedInUser extends BaseUser {
     chapterName: string,
     storyName: string
   ): Promise<void> {
-    const translateButtonSelector = '.e2e-test-opportunity-list-item-button';
-    await this.expectElementToBeVisible(translateButtonSelector);
-    await this.clickOnElementWithSelector(translateButtonSelector);
+    const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+    await this.page.waitForSelector(opportunityItemSelector, {
+      state: 'visible',
+      timeout: 30000,
+    });
+    const items = this.page.locator(opportunityItemSelector);
+    const count = await items.count();
+    for (let i = 0; i < count; i++) {
+      const heading = await items
+        .nth(i)
+        .locator('.e2e-test-opportunity-list-item-heading')
+        .textContent();
+      if (heading && heading.trim().includes(chapterName)) {
+        await items
+          .nth(i)
+          .locator('.e2e-test-opportunity-list-item-button')
+          .click();
+        return;
+      }
+    }
+    await this.clickOnElementWithSelector('.e2e-test-opportunity-list-item-button');
   }
 
   /**
@@ -1388,9 +1419,27 @@ export class LoggedInUser extends BaseUser {
     chapterName: string,
     storyName: string
   ): Promise<void> {
-    const translateButtonSelector = '.e2e-test-opportunity-list-item-button';
-    await this.expectElementToBeVisible(translateButtonSelector);
-    await this.clickOnElementWithSelector(translateButtonSelector);
+    const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+    await this.page.waitForSelector(opportunityItemSelector, {
+      state: 'visible',
+      timeout: 30000,
+    });
+    const items = this.page.locator(opportunityItemSelector);
+    const count = await items.count();
+    for (let i = 0; i < count; i++) {
+      const heading = await items
+        .nth(i)
+        .locator('.e2e-test-opportunity-list-item-heading')
+        .textContent();
+      if (heading && heading.trim().includes(chapterName)) {
+        await items
+          .nth(i)
+          .locator('.e2e-test-opportunity-list-item-button')
+          .click();
+        return;
+      }
+    }
+    await this.clickOnElementWithSelector('.e2e-test-opportunity-list-item-button');
   }
 
   /**
