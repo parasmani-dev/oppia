@@ -27,6 +27,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {SuperAdmin} from '../../utilities/user/super-admin';
+import {TranslationCoordinator} from '../../utilities/user/translation-coordinator';
 
 const ROLES = testConstants.Roles;
 
@@ -34,7 +35,7 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Translation Coordinator', function () {
   let superAdmin: SuperAdmin;
-  let translationCoordinator: LoggedInUser;
+  let translationCoordinator: TranslationCoordinator;
   let translationSubmitter: ExplorationEditor & CurriculumAdmin & LoggedInUser;
   let translationReviewer2: LoggedInUser;
   let releaseCoordinator: ReleaseCoordinator;
@@ -87,7 +88,9 @@ test.describe('Translation Coordinator', function () {
     const explorationId =
       await translationSubmitter.createAndPublishExplorationWithCards(
         'Solving problems without calculator',
-        'Algebra'
+        'Algebra',
+        2,
+        true
       );
 
     await translationSubmitter.createAndPublishTopic(
