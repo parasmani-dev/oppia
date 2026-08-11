@@ -1328,6 +1328,104 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the Contributor Dashboard Page.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.goto(testConstants.URLs.ContributorDashboard);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Switches tab in Contribution Dashboard.
+   */
+  async switchToTabInContributionDashboard(tabName: string): Promise<void> {
+    await this.clickOnElementWithText(tabName);
+  }
+
+  /**
+   * Selects language filter in contributor dashboard.
+   */
+  async selectLanguageFilter(language: string): Promise<void> {
+    const selector = '.e2e-test-language-selector';
+    await this.expectElementToBeVisible(selector);
+    await this.select(selector, language);
+  }
+
+  /**
+   * Clicks translate button in translate text tab.
+   */
+  async clickOnTranslateButtonInTranslateTextTab(
+    chapterName: string,
+    storyName: string
+  ): Promise<void> {
+    const translateButtonSelector = '.e2e-test-opportunity-list-item-button';
+    await this.expectElementToBeVisible(translateButtonSelector);
+    await this.clickOnElementWithSelector(translateButtonSelector);
+  }
+
+  /**
+   * Types text into RTE editor.
+   */
+  async typeTextForRTE(text: string): Promise<void> {
+    const rteSelector = '.e2e-test-rte';
+    await this.expectElementToBeVisible(rteSelector);
+    await this.typeInInputField(rteSelector, text);
+  }
+
+  /**
+   * Types text into translation input field.
+   */
+  async typeTextInTranslationInput(text: string): Promise<void> {
+    const textInputSelector = '.e2e-test-text-input';
+    await this.expectElementToBeVisible(textInputSelector);
+    await this.typeInInputField(textInputSelector, text);
+  }
+
+  /**
+   * Clicks translate button in translate review tab.
+   */
+  async clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+    chapterName: string,
+    storyName: string
+  ): Promise<void> {
+    const translateButtonSelector = '.e2e-test-opportunity-list-item-button';
+    await this.expectElementToBeVisible(translateButtonSelector);
+    await this.clickOnElementWithSelector(translateButtonSelector);
+  }
+
+  /**
+   * Starts translation review.
+   */
+  async startTranslationReview(
+    text: string,
+    storyName: string
+  ): Promise<void> {
+    const reviewButtonSelector = '.e2e-test-opportunity-list-item-button';
+    if (await this.isElementVisible(reviewButtonSelector)) {
+      await this.clickOnElementWithSelector(reviewButtonSelector);
+    }
+  }
+
+  /**
+   * Submits translation review.
+   */
+  async submitTranslationReview(
+    action: 'accept' | 'reject',
+    note?: string
+  ): Promise<void> {
+    const buttonText = action === 'accept' ? 'Accept' : 'Reject';
+    await this.clickOnElementWithText(buttonText);
+  }
+
+  /**
+   * Checks if review modal is present.
+   */
+  async expectReviewModalToBePresent(visible: boolean): Promise<void> {
+    const modalSelector = '.e2e-test-translation-review-modal';
+    await this.expectElementToBeVisible(modalSelector, visible);
+  }
+
+  /**
    * Navigates to the Moderator page.
    */
   async navigateToModeratorPage(): Promise<void> {
