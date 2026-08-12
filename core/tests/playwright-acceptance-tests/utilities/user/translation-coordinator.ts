@@ -55,7 +55,7 @@ export class TranslationCoordinator extends LoggedInUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
-  async navigateToContributorDashboardAdminPage(): Promise<void> {
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
     await this.waitForPageToFullyLoad();
   }

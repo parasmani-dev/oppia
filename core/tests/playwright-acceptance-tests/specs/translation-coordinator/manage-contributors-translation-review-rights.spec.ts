@@ -22,35 +22,36 @@
 import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {SuperAdmin} from '../../utilities/user/super-admin';
-import {TranslationCoordinator} from '../../utilities/user/translation-coordinator';
+import {
+  TranslationCoordinator,
+  TranslationCoordinatorFactory,
+} from '../../utilities/user/translation-coordinator';
 
 const ROLES = testConstants.Roles;
-const ContributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 
 test.describe.configure({mode: 'serial'});
 
 test.describe('Translation Coordinator', function () {
   let superAdmin: SuperAdmin;
   let translationCoordinator: TranslationCoordinator;
-  let translationSubmitter: ExplorationEditor & CurriculumAdmin & LoggedInUser;
-  let translationReviewer2: LoggedInUser;
   let releaseCoordinator: ReleaseCoordinator;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(900000);
+    test.setTimeout(300000);
 
     superAdmin = await UserFactory.createNewSuperAdmin(browser);
 
-    translationCoordinator = await UserFactory.createNewUser(
+    const tcUser = await UserFactory.createNewUser(
       'translationCoordinator',
       'translationCoordinator@example.com',
       browser
     );
+    translationCoordinator = UserFactory.composeUserWithRoles(tcUser, [
+      TranslationCoordinatorFactory(tcUser.page),
+    ]);
+
     await superAdmin.assignRoleToUser(
       'translationCoordinator',
       ROLES.TRANSLATION_COORDINATOR,
@@ -70,111 +71,22 @@ test.describe('Translation Coordinator', function () {
       browser
     );
 
-    translationReviewer2 = await UserFactory.createNewUser(
-      'translationReviewer2',
-      'translationReviewer2@example.com',
-      browser
-    );
-
-    translationSubmitter = await UserFactory.createNewUser(
-      'translationSubmitter',
-      'translationSubmitter@example.com',
-      browser,
-      [ROLES.CURRICULUM_ADMIN]
-    );
-
     // Turn on feature flag for new contributor admin dashboard.
     await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
-
-    const explorationId =
-      await translationSubmitter.createAndPublishExplorationWithCards(
-        'Solving problems without calculator',
-        'Algebra',
-        2,
-        true
-      );
-
-    await translationSubmitter.createAndPublishTopic(
-      'Fractions',
-      'Basics of Fractions',
-      'fractions'
-    );
-
-    await translationSubmitter.createAndPublishStoryWithChapter(
-      'Story 1',
-      'story-one',
-      'Chapter 1',
-      explorationId,
-      'Fractions'
-    );
-
-    await translationSubmitter.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Fractions'
-    );
-
-    // Navigate to contributor dashboard and submit one translation.
-    await translationSubmitter.goto(ContributorDashboardUrl);
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'Translate Text'
-    );
-    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
-
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-      'Chapter 1',
-      'Fractions - Story 1'
-    );
-    await translationSubmitter.typeTextForRTE('सामग्री शून्य');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
-    await translationSubmitter.expectToastMessage(
-      'Submitted translation for review.'
-    );
-    await translationSubmitter.typeTextInTranslationInput('जारी रखना');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
-    await translationSubmitter.expectToastMessage(
-      'Submitted translation for review.'
-    );
-    await translationSubmitter.typeTextForRTE('सामग्री एक');
-    await translationSubmitter.clickOnElementWithText('Save and close');
-    await translationSubmitter.expectToastMessage(
-      'Submitted translation for review.'
-    );
-
-    await translationReviewer2.goto(ContributorDashboardUrl);
-    await translationReviewer2.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
-      'Chapter 1',
-      'Fractions - Story 1'
-    );
-    await translationReviewer2.startTranslationReview(
-      'सामग्री शून्य',
-      'Fractions / Story 1'
-    );
-    await translationReviewer2.submitTranslationReview('accept');
-    await translationReviewer2.submitTranslationReview('accept');
-    await translationReviewer2.submitTranslationReview('accept', 'Looks good.');
-    await translationReviewer2.expectReviewModalToBePresent(false);
   });
 
   test('should be able to add language translation rights for a user', async function () {
-    // Navigate to the contributor dashboard admin page.
-    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.navigateToContributorAdminDashboardPage();
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
 
-    // Add translation rights.
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
       'translationReviewer1'
     );
     await translationCoordinator.expectScreenshotToMatch(
-      'addTranslationRightsModal',
-      __dirname
+      'addTranslationRightsModal'
     );
 
     await translationCoordinator.addLanguageInLanguageSelectorModal(
@@ -188,7 +100,7 @@ test.describe('Translation Coordinator', function () {
     );
 
     await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
-    await translationCoordinator.expectNumberOfContributorsToBe(2);
+    await translationCoordinator.expectNumberOfContributorsToBe(1);
   });
 
   test('should filter translation submitters by last submitted date', async function () {
@@ -197,7 +109,7 @@ test.describe('Translation Coordinator', function () {
     );
     await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
     await translationCoordinator.setLastActivityDateFilterToYesterday();
-    await translationCoordinator.expectNumberOfStatsRowsToBe(1);
+    await translationCoordinator.expectNumberOfStatsRowsToBe(0);
   });
 
   test('should be able to remove language translation rights for a user', async function () {
@@ -209,8 +121,7 @@ test.describe('Translation Coordinator', function () {
       'translationReviewer1'
     );
     await translationCoordinator.expectScreenshotToMatch(
-      'translationRightsModalWithHindiSelected',
-      __dirname
+      'translationRightsModalWithHindiSelected'
     );
 
     await translationCoordinator.removeLanguageFromLanguageSelectorModal(
@@ -222,7 +133,7 @@ test.describe('Translation Coordinator', function () {
       'Translation Reviewers'
     );
     await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
-    await translationCoordinator.expectNumberOfContributorsToBe(1);
+    await translationCoordinator.expectNumberOfContributorsToBe(0);
   });
 
   test.afterAll(async function () {

@@ -38,6 +38,7 @@ export default defineConfig({
   outputDir: PLAYWRIGHT_RESULTS_DIR,
   testDir: './specs',
   timeout: 300000,
+  repeatEach: process.env.REPEAT_EACH ? parseInt(process.env.REPEAT_EACH) : 1,
   fullyParallel: false,
   reporter: 'list',
   use: {

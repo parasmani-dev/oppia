@@ -94,7 +94,7 @@ export class UserFactory {
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
    */
-  private static composeUserWithRoles = function <
+  static composeUserWithRoles = function <
     TUser extends BaseUser,
     TRoles extends BaseUser[],
   >(user: TUser, roles: TRoles): TUser & UnionToIntersection<TRoles[number]> {
