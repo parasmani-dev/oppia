@@ -30,6 +30,7 @@ import {SuperAdmin} from '../../utilities/user/super-admin';
 import {TranslationCoordinator} from '../../utilities/user/translation-coordinator';
 
 const ROLES = testConstants.Roles;
+const ContributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 
 test.describe.configure({mode: 'serial'});
 
@@ -114,8 +115,7 @@ test.describe('Translation Coordinator', function () {
     );
 
     // Navigate to contributor dashboard and submit one translation.
-    await translationSubmitter.navigateToLearnerDashboard();
-    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+    await translationSubmitter.goto(ContributorDashboardUrl);
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
@@ -145,7 +145,7 @@ test.describe('Translation Coordinator', function () {
       'Submitted translation for review.'
     );
 
-    await translationReviewer2.navigateToContributorDashboardUsingProfileDropdown();
+    await translationReviewer2.goto(ContributorDashboardUrl);
     await translationReviewer2.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Chapter 1',
       'Fractions - Story 1'
