@@ -73,10 +73,10 @@ export class TranslationCoordinator extends LoggedInUser {
     if (this.isViewportAtMobileWidth()) {
       const modifiedName = tabName.replace(/s$/, '');
       await this.expectElementToBeVisible(tabSelectionDropdownMobileSelector);
-      await this.select(
-        tabSelectionDropdownMobileSelector,
-        modifiedName
+      await this.clickOnElementWithSelector(
+        tabSelectionDropdownMobileSelector
       );
+      await this.clickOnElementWithText(modifiedName);
     } else {
       const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(/ /g, '-');
       const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
